@@ -32,7 +32,7 @@ This:
 
 ```bash
 grep 'magic-context' ~/.config/opencode/opencode.jsonc
-ls ~/.cache/opencode/packages/@cortexkit/opencode-magic-context@latest/
+ls ~/.cache/opencode/packages/@cortexkit/
 ls ~/.local/share/cortexkit/magic-context/
 ```
 
@@ -143,8 +143,20 @@ OpenCode (main process)
 
 ```bash
 grep 'magic-context' ~/.config/opencode/opencode.jsonc
-cat ~/.opencode/opencode.json  # delete if global scope used
-cat ~/.opencode/tui.json       # delete if global scope used
+
+# Check if local scope files exist and what's in them:
+cat ~/.opencode/opencode.json 2>/dev/null
+cat ~/.opencode/tui.json 2>/dev/null
+```
+
+**To remove only the plugin entry (not the whole file)** — if the local files contain other settings beyond the plugin entry, edit the file and remove just `"@cortexkit/opencode-magic-context"` from the `"plugin"` array. If the file contains only the plugin entry or no other useful config, delete the entire file:
+
+```bash
+# Safe deletion check — only if file consists solely of the plugin entry:
+if [ -f ~/.opencode/opencode.json ] && [ "$(jq '.plugin | length' ~/.opencode/opencode.json 2>/dev/null)" = "1" ]; then
+  rm ~/.opencode/opencode.json
+  echo "Removed (only plugin entry)"
+fi
 ```
 
 Keep plugin in only one scope.
