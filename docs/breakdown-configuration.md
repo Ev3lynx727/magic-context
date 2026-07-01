@@ -155,7 +155,9 @@ cat ~/.opencode/tui.json 2>/dev/null
 # Targeted removal — removes just the magic-context entry from the plugin array,
 # never deletes the entire file even if it contains other config.
 if [ -f ~/.opencode/opencode.json ]; then
-  jq 'if (.plugin | length) == 1 then del(.plugin) else (.plugin |= map(select(. != "@cortexkit/opencode-magic-context"))) end'     ~/.opencode/opencode.json > /tmp/opencode_tmp.json && mv /tmp/opencode_tmp.json ~/.opencode/opencode.json
+  # Always filter first, then del only if nothing remains.
+jq '(.plugin |= map(select(. != "@cortexkit/opencode-magic-context"))) | if (.plugin | length) == 0 then del(.plugin) else . end' \\
+  ~/.opencode/opencode.json > /tmp/opencode_tmp.json && mv /tmp/opencode_tmp.json ~/.opencode/opencode.json
   echo "Removed magic-context entry from plugin array"
 fi
 ```
@@ -166,13 +168,13 @@ Keep plugin in only one scope.
 
 **Symptom:** Plugin listed in config but OpenCode shows loading errors.
 
-**Solution:** Install manually to cache:
+**Solution:** Re-install with the proper command:
 
 ```bash
-cd ~/.cache/opencode && npm install @cortexkit/opencode-magic-context --ignore-scripts
+opencode plugin @cortexkit/opencode-magic-context --global
 ```
 
-Or re-install with `opencode plugin @cortexkit/opencode-magic-context --global`.
+This installs to the canonical cache path (`~/.cache/opencode/packages/@cortexkit/`). Only use manual `npm install` inside `~/.cache/opencode` as a last resort — it installs to `node_modules/` which the package cache table above notes is **not canonical** and may not be discovered by OpenCode.
 
 ---
 
