@@ -157,8 +157,7 @@ cat ~/.opencode/tui.json 2>/dev/null
 if [ -f ~/.opencode/opencode.json ]; then
   # Always filter first, then del only if nothing remains.
 jq '(.plugin |= map(select(. != "@cortexkit/opencode-magic-context"))) | if (.plugin | length) == 0 then del(.plugin) else . end' \
-  ~/.opencode/opencode.json > /tmp/opencode_tmp.json && mv /tmp/opencode_tmp.json ~/.opencode/opencode.json
-  echo "Removed magic-context entry from plugin array" && :
+  ~/.opencode/opencode.json > /tmp/opencode_tmp.json && mv /tmp/opencode_tmp.json ~/.opencode/opencode.json && echo "Removed magic-context entry from plugin array" && :
 fi
 ```
 
