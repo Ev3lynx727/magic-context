@@ -149,13 +149,14 @@ cat ~/.opencode/opencode.json 2>/dev/null
 cat ~/.opencode/tui.json 2>/dev/null
 ```
 
-**To remove only the plugin entry (not the whole file)** — if the local files contain other settings beyond the plugin entry, edit the file and remove just `"@cortexkit/opencode-magic-context"` from the `"plugin"` array. If the file contains only the plugin entry or no other useful config, delete the entire file:
+**To remove only the plugin entry (not the whole file):**
 
 ```bash
-# Safe deletion check — only if file consists solely of the plugin entry:
-if [ -f ~/.opencode/opencode.json ] && [ "$(jq '.plugin | length' ~/.opencode/opencode.json 2>/dev/null)" = "1" ]; then
-  rm ~/.opencode/opencode.json
-  echo "Removed (only plugin entry)"
+# Targeted removal — removes just the magic-context entry from the plugin array,
+# never deletes the entire file even if it contains other config.
+if [ -f ~/.opencode/opencode.json ]; then
+  jq 'if (.plugin | length) == 1 then del(.plugin) else (.plugin |= map(select(. != "@cortexkit/opencode-magic-context"))) end'     ~/.opencode/opencode.json > /tmp/opencode_tmp.json && mv /tmp/opencode_tmp.json ~/.opencode/opencode.json
+  echo "Removed magic-context entry from plugin array"
 fi
 ```
 
